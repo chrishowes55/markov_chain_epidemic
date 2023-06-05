@@ -27,15 +27,29 @@ def calculate_points(I_0, N, T, timestep, beta, gamma):
     return (S, I, R)
 
 
+def average_over_datapoints(I_0, N, T, timestep, beta, gamma):
+    Sprime, Iprime, Rprime = calculate_points(I_0, N, T, timestep, beta, gamma)
+    for i in range(0, 100):
+        S, I, R = calculate_points(I_0, N, T, timestep, beta, gamma)
+        np.vstack((Sprime, S))
+        np.vstack((Iprime, I))
+        np.vstack((Rprime, R))
+    S = np.matrix(Sprime).mean(0)
+    I = np.matrix(Iprime).mean(0)
+    R = np.matrix(Rprime).mean(0)
+    return (S, I, R)
+
+
 N = 2000
 I_0 = 15
 beta = 0.6
 gamma = 0.3
 T = 100 * 24 * 60  # 100 days in seconds
 timestep = 1
-S, I, R = calculate_points(I_0, N, T, timestep, beta, gamma)
+S, I, R = average_over_datapoints(I_0, N, T, timestep, beta, gamma)
 Trange = np.arange(0, T, timestep)
-plt.plot(Trange, S, color="b")
-plt.plot(Trange, I, color="r")
-plt.plot(Trange, R, color="g")
+plt.plot(Trange, S.tolist()[0], color="b", label="S")
+plt.plot(Trange, I.tolist()[0], color="r", label="I")
+plt.plot(Trange, R.tolist()[0], color="g", label="R")
+plt.legend()
 plt.show()
